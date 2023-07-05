@@ -1,8 +1,8 @@
 # Motivation for Migrations 
 
-While the current NixOS Configuration system works incredibly well for immutable services, not all services are immutable; and we currently lack facilities to handling imperative steps needed to upgrade or downgrade complex stateful services. Nix can even be an obstacle to doing so, as often these steps are dissonant with the methodologies required for declarative and immutable structures. 
+While the current NixOS Configuration system works incredibly well for immutable services, not all services are immutable, and we currently lack facilities to handling imperative steps needed to upgrade or downgrade complex stateful services. Nix can even be an obstacle to doing so, as often these steps are dissonant with the methodologies required for declarative and immutable structures.
 
-Lets take the example of GitLab. GitLab is notoriously hard to upgrade, and the current NixOS module system produces major obstacles to upgrades of this nature as, GitLab expects the user to run many imperative steps to modify stateful parts of the application, such as the database and configuration files. The need to migrate stateful portions of an application to new versions is nothing new; database migrations are standard practice and can provide structure and inform the concerns of module migrations.
+Let's take the example of GitLab. GitLab is notoriously hard to upgrade, and the current NixOS module system produces major obstacles to upgrades of this nature, as GitLab expects the user to run many imperative steps to modify stateful parts of the application such as the database and configuration files. The need to migrate stateful portions of an application to new versions is nothing new; database migrations are standard practice and can provide structure and inform the concerns of module migrations.
 
 With the extension of the NixOS Configuration system with migration infrastructure, we can close this conceptual gap and fully realize the value of atomic immutable deployments, as we gain the ability to atomically migrate parts of stateful services along with the packages and definitions.
 
@@ -23,7 +23,7 @@ The following extension to the module system and standard is proposed. Each migr
 
 ## Version Information
 
-For migrations to work we must know what version the stateful parts of this service are currently using; this will be stored in the metadata of the systemd service in a standard location to be determined. This is needed for the same reason as in the database migration context, to determine which migrations are needed to achieve the new state.
+For migrations to work we must know what version the stateful parts of this service are currently using; this will be stored in the metadata of the systemd service in a standard location to be determined. This is needed for the same reason as in the database migration context: to determine which migrations are needed to achieve the new state.
 
 ```Nix
 {
@@ -89,7 +89,7 @@ There are limitations for to the effectiveness of up and down scripts. For examp
 }
 ```
 
-`$BACKUP` is a path to a location in tmpfs, that will be deleted at the end of the process. This provides a temporary location to backup state if needed. `up.backup` is a hook that will run before `up.script`. If `up.script` encounters and error `up.restore` is run to ensure that the failed migration does not result in contamination of the system. These options are available on both `up` and `down` definitions. This roughly allows for transaction like logic for the migration.
+`$BACKUP` is a path to a temporary filesystem location which will be deleted upon completion of the migration. This provides a temporary location to backup state if needed. `up.backup` is a hook that will run before `up.script`. If `up.script` encounters an error, `up.restore` is run to ensure that the failed migration does not result in contamination of the system. These options are available in both `up` and `down` definitions. This roughly allows for transaction-like logic for the migration.
 
 # Testing
 
@@ -104,7 +104,7 @@ Migrations need to be run in order, executing each one at a time. This is accomp
 In this effort we also hope to provide migrations for the following modules, establishing the ability to migrate Nix Modules for the future.
 
 - GitLab
-- Postgresql (needs to work well with entities like `ensure`
+- Postgresql (needs to work well with entities like `ensure`)
 - Jira
 - MySQL
 - Kibana
